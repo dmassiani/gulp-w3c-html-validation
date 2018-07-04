@@ -28,9 +28,11 @@ const defaultOptions = {
 	relaxerror:       [],
 	remotePath:       '',
 	reportpath:       'w3cErrors/validation-report.json',
+	reportFolderName: 'w3c',
 	reset:            true,
 	stoponerror:      false,
 	useTimeStamp:     true,
+	verbose:					true,
 };
 
 // Global variables
@@ -228,7 +230,7 @@ const gulpW3cHtml = (options = {}) => {
 			filePath = file.path.replace(file.cwd+'/', '');
 		}
 
-		gutil.log(msg.start + filePath);
+		if (gulpOptions.verbose) gutil.log(msg.start + filePath);
 
 		let w3cjs_options = {
 			//file: files[counter],       // file can either be a local file or a remote file
@@ -256,7 +258,7 @@ const gulpW3cHtml = (options = {}) => {
 						retryCount = 0;
 					}
 
-					gutil.log(netErrorMsg);
+					if (gulpOptions.verbose) gutil.log(netErrorMsg);
 					if (exitProcess) {
 						process.exit(1);
 					}
@@ -270,7 +272,7 @@ const gulpW3cHtml = (options = {}) => {
 
 				var setGreen = function () {
 					readSettings[filePath] = true;
-					gutil.log(msg.ok.green);
+					if (gulpOptions.verbose) gutil.log(msg.ok.green);
 
 					addToReport(filePath, false);
 				};
@@ -298,13 +300,13 @@ const gulpW3cHtml = (options = {}) => {
 								lineNumber = lineNumber.prompt;
 							}
 
-							gutil.log(errorCount + '=> '.warn + JSON.stringify(res.messages[prop].message).help + lineNumber );
+							if (gulpOptions.verbose) gutil.log(errorCount + '=> '.warn + JSON.stringify(res.messages[prop].message).help + lineNumber );
 						}
 
 					}
 
 					if (errorCount !== 0) {
-						gutil.log('No of errors: '.error + errorCount);
+						if (gulpOptions.verbose) gutil.log('No of errors: '.error + errorCount);
 					}
 
 					readSettings[filePath] = false;
@@ -356,13 +358,13 @@ const gulpW3cHtml = (options = {}) => {
 			if (gulpOptions.generateCheckstyleReport) {
 				let checkstyleReport = generateCheckstyleReport( combinedErrorReports );
 				utils.writeFile( gulpOptions.generateCheckstyleReport, checkstyleReport );
-				gutil.log('Checkstyle report generated: '.green + gulpOptions.generateCheckstyleReport );
+				if (gulpOptions.verbose) gutil.log('Checkstyle report generated: '.green + gulpOptions.generateCheckstyleReport );
 			}
 		};
 		function initValidationReport() {
 			if (gulpOptions.reportpath) {
 				utils.writeFile(gulpOptions.reportpath, JSON.stringify(reportArry));
-				gutil.log('Validation report generated: '.green + gulpOptions.reportpath);
+				if (gulpOptions.verbose) gutil.log('Validation report generated: '.green + gulpOptions.reportpath);
 			}
 		};
 		function initFailHard() {
@@ -372,7 +374,7 @@ const gulpW3cHtml = (options = {}) => {
 				}, 0);
 
 				if (validationErrCount > 0) {
-					gutil.log(validationErrCount + ' total unignored HTML validation error(s).');
+					if (gulpOptions.verbose) gutil.log(validationErrCount + ' total unignored HTML validation error(s).');
 					process.exit(1);
 				}
 			}
